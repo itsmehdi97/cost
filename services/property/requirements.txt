@@ -1,0 +1,4 @@
+starlette
+gunicorn
+uvicorn
+sqlalchemy
