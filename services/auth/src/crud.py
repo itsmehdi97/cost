@@ -15,7 +15,6 @@ def get_users(db: Session, skip: int = 0, limit: int = 50):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 def create_user(db: Session, user: schemas.UserCreate):
-    # TODO: Hash password
     user.password = utils.hash_password(user.password)
     db_user = models.User(**user.dict(), profile_id=None)
     db.add(db_user)

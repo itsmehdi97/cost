@@ -14,11 +14,6 @@ import utils
 import config
 
 
-SECRET_KEY = os.environ.get("SECRET", "Super Secret")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-
 
 app = FastAPI()
 
