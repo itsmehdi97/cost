@@ -2,7 +2,6 @@ import os
 from typing import Optional
 
 from datetime import timedelta, datetime
-from database import Session
 
 from passlib.context import CryptContext
 from jose import JWTError, jwt

@@ -67,7 +67,7 @@ def login(db: Session=Depends(get_db), form_data: OAuth2PasswordRequestForm=Depe
 
     access_token_expires = timedelta(minutes=config.get_settings().ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = utils.create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires)
+        data={"sub": user.username, "uid": user.id}, expires_delta=access_token_expires)
    
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")

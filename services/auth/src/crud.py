@@ -1,4 +1,3 @@
-from sqlalchemy.orm import session
 import models
 import schemas
 import utils
