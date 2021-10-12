@@ -3,7 +3,7 @@ services:
   web:
     build: .
     ports:
-      - "8000:80"
+      - "8001:80"
     volumes:
       - ./src:/src
 
@@ -15,16 +15,7 @@ services:
     volumes:
         - service-data:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    ports:
-      - 5452:80
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=user@domain.com
-      - PGADMIN_DEFAULT_PASSWORD=pass
-    logging:
-      driver: none
 
 
 volumes:
-    service-data:
+  service-data:
