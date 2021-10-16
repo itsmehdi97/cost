@@ -17,6 +17,12 @@ class PropertyCreate(PropertyBase):
     price: Decimal
 
 
+class PropertyUpdate(PropertyBase):
+    id: str
+    title: str
+    price: Decimal
+
+
 class Property(PropertyBase):
     id: int
     user_id: int
