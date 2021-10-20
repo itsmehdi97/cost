@@ -21,7 +21,7 @@ async def _publish_msg(
     await exc.publish(msg, routing_key=routing_key) 
 
 
-async def property_added(conn: aio_pika.Connection, prop: schemas.PropertyUpdate):
+async def property_added(conn: aio_pika.Connection, prop: schemas.Property):
     async with conn.channel() as ch:
         await _publish_msg(
             ch,
@@ -30,8 +30,9 @@ async def property_added(conn: aio_pika.Connection, prop: schemas.PropertyUpdate
 
 
 async def property_updated(conn: aio_pika.Connection, prop: schemas.Property):
+    print('publishing', prop)
     async with conn.channel() as ch:
         await _publish_msg(
             ch,
             prop.json(),
-            'prop.updated')
+            'prop.update')

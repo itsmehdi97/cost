@@ -25,6 +25,20 @@ services:
     networks:
       - db
       - queue
+  
+  tax:
+    image: tax:latest
+    build: ./tax
+    ports:
+      - 8004:80
+    volumes: 
+      - "./tax/src:/src"
+    depends_on:
+      - db
+      - queue
+    networks:
+      - db
+      - queue
 
   db:
     image: postgres:13.3

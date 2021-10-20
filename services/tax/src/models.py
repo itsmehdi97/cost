@@ -61,3 +61,22 @@ class BaseModel(Base):
 
     def update(self):
         Session().commit()
+
+
+class UserTax(BaseModel):
+    __tablename__ = "user_tax"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, nullable=False, unique=True)
+    balance = Column(Numeric, nullable=False)
+
+
+class UserProperty(BaseModel):
+    __tablename__ = "user_property"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, nullable=False)
+    prop_id = Column(Integer, nullable=False)
+    price = Column(Numeric, nullable=False)
+    transfer_date = Column(DateTime, nullable=False)
+    

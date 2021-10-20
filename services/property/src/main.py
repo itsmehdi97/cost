@@ -32,7 +32,7 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     print('# Closing rabbitmq connection')
-    rabbit_conn.close()
+    await rabbit_conn.close()
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -109,8 +109,10 @@ async def transfer_ownership(
             )
         
         crud.update_property(db, prop)
+        print(db_prop)
+        db.refresh(db_prop)
 
         bg_tasks.add_task(
-            tasks.property_updated, rabbit_conn, prop)
+            tasks.property_updated, rabbit_conn, schemas.Property(**db_prop.__dict__))
 
         return db_prop
