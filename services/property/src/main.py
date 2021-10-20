@@ -89,6 +89,12 @@ async def transfer_ownership(
         user: schemas.User = Depends(current_user),
         db: Session = Depends(get_db)
     ):
+        if crud.get_property(db, user.id, prop.title):
+            raise HTTPException(
+                status_code=400,
+                detail="property already exists",
+            )
+
         db_prop = crud.get_property_by_id(db, prop_id)
         if not db_prop:
             raise HTTPException(
