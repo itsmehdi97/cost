@@ -1,0 +1,12 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  queue:
+    build: .
+    ports:
+      - "15671:15671"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/data
+
+volumes:
+  rabbitmq-data:
