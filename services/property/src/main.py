@@ -1,4 +1,7 @@
-from fastapi import FastAPI, Depends, HTTPException
+import json
+import logging
+
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.security import OAuth2PasswordBearer
 
 import crud
@@ -6,8 +9,42 @@ import schemas
 from database import Session
 import jwt_utils
 
+import aio_pika
+
 
 app = FastAPI()
+
+
+rabbit_conn = None
+
+@app.on_event("startup")
+async def startup_event():
+    global rabbit_conn
+    
+    print('# Connecting to rabbitmq broker')
+
+    rabbit_conn = await aio_pika.connect_robust(host='queue') 
+    async with rabbit_conn.channel() as ch:
+        await ch.declare_exchange('props', type='topic', durable=True)
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    print('# Closing rabbitmq connection')
+    rabbit_conn.close()
+
+
+async def property_added(prop: schemas.Property):
+    async with rabbit_conn.channel() as ch:
+        exc = await ch.get_exchange('props')
+        body = bytes(prop.json(), encoding='utf-8')
+        msg = aio_pika.Message(
+            body,
+            delivery_mode=aio_pika.DeliveryMode.PERSISTENT
+        )
+        print('# publishing msg', body)
+        await exc.publish(msg, routing_key="prop.add")
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -35,6 +72,7 @@ async def current_user(token: str = Depends(oauth2_scheme)):
 @app.post("/properties/", response_model=schemas.Property)
 async def create_property(
         property: schemas.PropertyCreate,
+        bg_tasks: BackgroundTasks,
         db: Session = Depends(get_db),
         user: schemas.User = Depends(current_user)
     ):
@@ -46,7 +84,11 @@ async def create_property(
         )
 
     property.user_id = user.id
-    return crud.create_property(db, property)
+    new_prop = crud.create_property(db, property)
+
+    bg_tasks.add_task(property_added, schemas.Property(**new_prop.__dict__))
+
+    return new_prop
 
 
 @app.put("/properties/{prop_id}", response_model=schemas.Property)
