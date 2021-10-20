@@ -1,5 +1,6 @@
 from decimal import Decimal
 from typing import Optional
+from datetime import datetime
 
 from sqlalchemy.sql.sqltypes import DECIMAL
 
@@ -24,6 +25,8 @@ class PropertyUpdate(PropertyBase):
 
 
 class Property(PropertyBase):
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
     id: int
     user_id: int
     title: str
