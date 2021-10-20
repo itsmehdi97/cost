@@ -1,0 +1,71 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  auth:
+    image: auth:latest
+    build: ./auth
+    ports:
+      - 8001:80
+    volumes:
+      - "./auth/src:/src"
+    depends_on:
+      - db
+    networks:
+      - db
+
+  prop:
+    image: prop:latest
+    build: ./property
+    ports:
+      - 8000:80
+    volumes: 
+      - "./property/src:/src"
+    depends_on:
+      - db
+      - queue
+    networks:
+      - db
+      - queue
+
+  db:
+    image: postgres:13.3
+    environment:
+        - POSTGRES_PASSWORD=pass
+        - POSTGRES_USER=user
+    volumes:
+        - db-data:/var/lib/postgresql/data
+    networks:
+      - db
+
+  queue:
+    image: queue:latest
+    build: ./event_queue
+    ports:
+      - "15671:15671"
+      - "15672:15672"
+    volumes:
+      - rabbit-data:/data
+    networks:
+      - queue
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - 5452:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.com
+      - PGADMIN_DEFAULT_PASSWORD=pass
+    logging:
+      driver: none
+    depends_on:
+      - db
+    networks:
+      - db
+
+volumes:
+  db-data:
+  rabbit-data:
+
+networks:
+  queue:
+  db:
+  
