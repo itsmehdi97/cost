@@ -8,6 +8,7 @@ import crud
 import schemas
 from database import Session
 import jwt_utils
+import tasks
 
 import aio_pika
 
@@ -32,18 +33,6 @@ async def startup_event():
 async def shutdown_event():
     print('# Closing rabbitmq connection')
     rabbit_conn.close()
-
-
-async def property_added(prop: schemas.Property):
-    async with rabbit_conn.channel() as ch:
-        exc = await ch.get_exchange('props')
-        body = bytes(prop.json(), encoding='utf-8')
-        msg = aio_pika.Message(
-            body,
-            delivery_mode=aio_pika.DeliveryMode.PERSISTENT
-        )
-        print('# publishing msg', body)
-        await exc.publish(msg, routing_key="prop.add")
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -86,7 +75,8 @@ async def create_property(
     property.user_id = user.id
     new_prop = crud.create_property(db, property)
 
-    bg_tasks.add_task(property_added, schemas.Property(**new_prop.__dict__))
+    bg_tasks.add_task(
+        tasks.property_added, rabbit_conn, schemas.Property(**new_prop.__dict__))
 
     return new_prop
 
@@ -94,6 +84,7 @@ async def create_property(
 @app.put("/properties/{prop_id}", response_model=schemas.Property)
 async def transfer_ownership(
         prop_id: int,
+        bg_tasks: BackgroundTasks,
         prop: schemas.PropertyUpdate,
         user: schemas.User = Depends(current_user),
         db: Session = Depends(get_db)
@@ -112,4 +103,8 @@ async def transfer_ownership(
             )
         
         crud.update_property(db, prop)
+
+        bg_tasks.add_task(
+            tasks.property_updated, rabbit_conn, prop)
+
         return db_prop
