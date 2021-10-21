@@ -16,7 +16,7 @@ async def start_consuming(
         queue='props_changes'
     ):
     async with conn.channel() as channel:
-        channel.set_qos(prefetch_count=1)
+        await channel.set_qos(prefetch_count=1)
         exc = await channel.get_exchange(exchange, ensure=True)
         q = await channel.declare_queue(
             name=queue,
@@ -39,9 +39,11 @@ async def on_prop_msg(msg: IncomingMessage):
     db = Session()
     try:
         if msg_type == 'add':
-            await tasks.property_added(db, schemas.PropertyCreate.parse_raw(msg.body))
+            await tasks.property_added(
+                db, schemas.PropertyCreate.parse_raw(msg.body))
         elif msg_type == 'update':
-            await tasks.property_updated(db, schemas.PropertyUpdate.parse_raw(msg.body))
+            await tasks.property_updated(
+                db, schemas.PropertyUpdate.parse_raw(msg.body))
         else:
             print('# Unknown prop message type: %r' % msg_type)
         
