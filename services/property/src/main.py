@@ -1,5 +1,6 @@
 import json
 import logging
+import asyncio
 
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.security import OAuth2PasswordBearer
@@ -9,6 +10,7 @@ import schemas
 from database import Session
 import jwt_utils
 import tasks
+import consumer
 
 import aio_pika
 
@@ -27,6 +29,14 @@ async def startup_event():
     rabbit_conn = await aio_pika.connect_robust(host='queue') 
     async with rabbit_conn.channel() as ch:
         await ch.declare_exchange('props', type='topic', durable=True)
+
+    asyncio.create_task(
+        consumer.start_consuming(
+            rabbit_conn,
+            'props',
+            'prop.transfer',
+            consumer.on_prop_msg,
+            queue='props_ownership_trans'))
 
 
 @app.on_event("shutdown")
@@ -82,7 +92,7 @@ async def create_property(
 
 
 @app.put("/properties/{prop_id}", response_model=schemas.Property)
-async def transfer_ownership(
+async def update_property(
         prop_id: int,
         bg_tasks: BackgroundTasks,
         prop: schemas.PropertyUpdate,

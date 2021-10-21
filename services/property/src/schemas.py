@@ -36,6 +36,12 @@ class Property(PropertyBase):
         orm_mode = True
 
 
+class PropertyTransfer(BaseModel):
+    id: int
+    price: Decimal
+    user_id: int
+
+
 class User(BaseModel):
     id: int
     username: str

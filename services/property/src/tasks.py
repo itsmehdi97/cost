@@ -1,8 +1,11 @@
+from typing import Union
+from datetime import datetime
+
 import aio_pika
 
-from typing import Union
-
 import schemas
+import models
+from database import Session
 
 
 
@@ -36,3 +39,18 @@ async def property_updated(conn: aio_pika.Connection, prop: schemas.Property):
             ch,
             prop.json(),
             'prop.update')
+
+
+async def property_transferred(db: Session, prop: schemas.PropertyTransfer):
+    print('## Applying Transfer ---> ', prop)
+
+    values = {
+        'user_id': prop.user_id,
+        'price': prop.price,
+        'transfer_date': datetime.now()
+    }    
+    
+    db.query(models.Property) \
+        .filter(models.Property.id == prop.id) \
+        .update(values, synchronize_session=False)
+    db.commit()
