@@ -70,3 +70,4 @@ class Property(BaseModel):
     user_id = Column(Integer, nullable=False)
     title = Column(String(128), nullable=False)
     price = Column(Numeric, nullable=False)
+    transfer_date = Column(DateTime, nullable=True)
