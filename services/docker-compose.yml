@@ -68,6 +68,8 @@ services:
     environment:
       - PGADMIN_DEFAULT_EMAIL=user@domain.com
       - PGADMIN_DEFAULT_PASSWORD=pass
+    volumes:
+      - pgadmin-servers:/pgadmin4/servers.json
     logging:
       driver: none
     depends_on:
@@ -78,6 +80,7 @@ services:
 volumes:
   db-data:
   rabbit-data:
+  pgadmin-servers:
 
 networks:
   queue:
