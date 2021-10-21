@@ -41,12 +41,15 @@ async def on_prop_msg(msg: IncomingMessage):
         if msg_type == 'add':
             await tasks.property_added(
                 db, schemas.PropertyCreate.parse_raw(msg.body))
+            msg.ack()
+
         elif msg_type == 'update':
             await tasks.property_updated(
                 db, schemas.PropertyUpdate.parse_raw(msg.body))
+            msg.ack()
+
         else:
             print('# Unknown prop message type: %r' % msg_type)
         
-        msg.ack()
     finally:
         db.close()
