@@ -1,4 +1,4 @@
-
+from datetime import datetime
 import schemas
 import models
 from database import Session
@@ -19,15 +19,16 @@ async def property_added(db: Session, prop: schemas.PropertyCreate):
 
 
 async def property_updated(db: Session, prop: schemas.PropertyUpdate):
-    print('------ > updateing', prop)
     #TODO: transfer date can have wrong value.
     values = {
         'prop_id': prop.id,
         'user_id': prop.user_id,
         'price': prop.price,
-        'transfer_date': prop.updated_at or prop.created_at
+        'transfer_date': prop.updated_at or prop.created_at,
+        'updated_at': datetime.now()
     }
-    schemas.PropertyUpdate.parse_obj(values)
+
+    schemas.UserPropUpdate.parse_obj(values)
 
     update_count = db.query(models.UserProperty) \
         .filter(

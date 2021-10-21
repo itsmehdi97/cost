@@ -21,8 +21,8 @@ class PropertyCreate(PropertyBase):
 
 class PropertyUpdate(PropertyBase):
     id: int
+    updated_at: datetime
     created_at: datetime
-    updated_at: Optional[datetime]
 
 
 class Property(PropertyBase):
@@ -32,6 +32,16 @@ class Property(PropertyBase):
 
     class Config:
         orm_mode = True
+
+
+class UserPropertyCreate(PropertyBase):
+    prop_id: int
+    transfer_date: datetime
+
+
+class UserPropUpdate(PropertyBase):
+    prop_id: int
+    transfer_date: datetime
 
 
 class User(BaseModel):
