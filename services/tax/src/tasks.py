@@ -19,12 +19,11 @@ async def property_added(db: Session, prop: schemas.PropertyCreate):
 
 
 async def property_updated(db: Session, prop: schemas.PropertyUpdate):
-    #TODO: transfer date can have wrong value.
     values = {
         'prop_id': prop.id,
         'user_id': prop.user_id,
         'price': prop.price,
-        'transfer_date': prop.updated_at or prop.created_at,
+        'transfer_date': prop.transfer_date,
         'updated_at': datetime.now()
     }
 

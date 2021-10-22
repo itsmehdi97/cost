@@ -23,6 +23,7 @@ class PropertyUpdate(PropertyBase):
     id: int
     updated_at: datetime
     created_at: datetime
+    transfer_date: Optional[datetime]
 
 
 class Property(PropertyBase):
@@ -36,6 +37,11 @@ class Property(PropertyBase):
 
 class UserPropertyCreate(PropertyBase):
     prop_id: int
+    transfer_date: datetime
+
+
+class PropertyTransfer(PropertyBase):
+    id: int
     transfer_date: datetime
 
 
