@@ -26,6 +26,7 @@ async def startup_event():
     async with rabbit_conn.channel() as ch:
         await ch.declare_exchange('props', type='topic', durable=True)
 
+    #TODO: number of consumers bound to gunicorn worker threads.
     asyncio.create_task(
         consumer.start_consuming(
         rabbit_conn,
