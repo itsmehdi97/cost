@@ -38,6 +38,17 @@ async def property_updated(db: Session, prop: schemas.PropertyUpdate):
     return update_count
 
 
+async def property_transferred(db: Session, prop: schemas.PropertyTransfer):
+    values = prop.dict()
+    values['updated_at'] = datetime.now()
+
+    update_count = db.query(models.UserProperty) \
+        .filter(models.UserProperty.id == prop.id) \
+        .update(values, synchronize_session=False)
+    db.commit()
+    return update_count
+
+
 # def update_property(db: Session, prop: schemas.PropertyUpdate):
 #     values = prop.dict()
 #     values['updated_at'] = datetime.now()

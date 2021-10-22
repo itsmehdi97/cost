@@ -48,6 +48,10 @@ async def on_prop_msg(msg: IncomingMessage):
                 db, schemas.PropertyUpdate.parse_raw(msg.body))
             msg.ack()
 
+        elif msg_type == 'transfer':
+            await tasks.property_transferred(
+                db, schemas.PropertyTransfer.parse_raw(msg.body))
+
         else:
             print('# Unknown prop message type: %r' % msg_type)
         
