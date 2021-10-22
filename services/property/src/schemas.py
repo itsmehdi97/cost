@@ -40,6 +40,7 @@ class PropertyTransfer(BaseModel):
     id: int
     price: Decimal
     user_id: int
+    transfer_date: datetime
 
 
 class User(BaseModel):

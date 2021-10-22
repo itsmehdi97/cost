@@ -45,7 +45,7 @@ async def property_transferred(db: Session, prop: schemas.PropertyTransfer):
     values = {
         'user_id': prop.user_id,
         'price': prop.price,
-        'transfer_date': datetime.now()
+        'transfer_date': prop.transfer_date
     }    
     
     db.query(models.Property) \
