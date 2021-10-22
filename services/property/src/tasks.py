@@ -42,8 +42,6 @@ async def property_updated(conn: aio_pika.Connection, prop: schemas.Property):
 
 
 async def property_transferred(db: Session, prop: schemas.PropertyTransfer):
-    print('## Applying Transfer ---> ', prop)
-
     values = {
         'user_id': prop.user_id,
         'price': prop.price,
