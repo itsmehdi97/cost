@@ -1,0 +1,11 @@
+fastapi
+gunicorn
+uvicorn
+psycopg2-binary
+sqlalchemy
+alembic
+pyjwt
+python-multipart
+python-jose[cryptography]
+pydantic[dotenv]
+aio-pika

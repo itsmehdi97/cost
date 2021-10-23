@@ -1,0 +1,31 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  web:
+    command: uvicorn main:app --workers 4 --reload --host 0.0.0.0 --port 80 --log-level debug
+    # command: gunicorn -w 4 -b 0.0.0.0:80 -k uvicorn.workers.UvicornWorker --log-level debug main:app
+    build: .
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src:/src
+
+  db:
+    image: postgres:13.3
+    environment:
+        - POSTGRES_PASSWORD=pass
+        - POSTGRES_USER=user
+    volumes:
+        - service-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - 5452:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.com
+      - PGADMIN_DEFAULT_PASSWORD=pass
+    logging:
+      driver: none
+
+volumes:
+    service-data:
