@@ -1,8 +1,8 @@
-"""create userprop and usertax tables
+"""create user tax and user prop tables
 
-Revision ID: d1f14bcba4b9
+Revision ID: 0859df769af8
 Revises: 
-Create Date: 2021-10-20 13:49:39.084610
+Create Date: 2021-10-23 09:18:20.746759
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd1f14bcba4b9'
+revision = '0859df769af8'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,7 +25,7 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('prop_id', sa.Integer(), nullable=False),
     sa.Column('price', sa.Numeric(), nullable=False),
-    sa.Column('transfer_date', sa.DateTime(), nullable=False),
+    sa.Column('transfer_date', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user_tax',

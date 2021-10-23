@@ -78,5 +78,5 @@ class UserProperty(BaseModel):
     user_id = Column(Integer, nullable=False)
     prop_id = Column(Integer, nullable=False)
     price = Column(Numeric, nullable=False)
-    transfer_date = Column(DateTime, nullable=False)
+    transfer_date = Column(DateTime, nullable=True)
     

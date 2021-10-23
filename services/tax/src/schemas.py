@@ -35,10 +35,6 @@ class Property(PropertyBase):
         orm_mode = True
 
 
-class UserPropertyCreate(PropertyBase):
-    prop_id: int
-    transfer_date: datetime
-
 
 class PropertyTransfer(PropertyBase):
     id: int
@@ -47,7 +43,7 @@ class PropertyTransfer(PropertyBase):
 
 class UserPropUpdate(PropertyBase):
     prop_id: int
-    transfer_date: datetime
+    transfer_date: Optional[datetime] = None
 
 
 class User(BaseModel):
