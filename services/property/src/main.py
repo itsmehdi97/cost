@@ -3,7 +3,7 @@ import logging
 import asyncio
 
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
-from fastapi.responses import JSONResponse
+from fastapi.responses import Response
 from fastapi.security import OAuth2PasswordBearer
 
 import crud
@@ -72,7 +72,7 @@ async def current_user(token: str = Depends(oauth2_scheme)):
 
 @app.get("/ping")
 async def ping():
-    return JSONResponse(status_code=204)
+    return Response(status_code=204)
 
 
 

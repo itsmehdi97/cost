@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import Response
 from fastapi.security import OAuth2PasswordBearer
 
 from database import Session
@@ -49,7 +49,7 @@ async def current_user(token: str = Depends(oauth2_scheme)):
 
 @app.get("/ping")
 async def ping():
-    return JSONResponse(status_code=204)
+    return Response(status_code=200)
 
 
 @app.post("/place-offer", response_model=schemas.Offer)

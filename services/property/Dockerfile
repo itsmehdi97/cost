@@ -1,5 +1,7 @@
 FROM python:3.9.4-slim
 
+RUN apt update && \
+    apt install -y curl
 
 ENV PYTHONUNBUFFERED=1
 ENV WORKDIR=/src
@@ -15,4 +17,4 @@ EXPOSE 80
 # CMD gunicorn -w 4 -b 0.0.0.0:80 -k uvicorn.workers.UvicornWorker --log-level debug app:app
 CMD uvicorn main:app --reload --host 0.0.0.0 --port 80 --log-level debug
 
-# HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "executable" ]
+HEALTHCHECK --interval=8s --timeout=8s --start-period=10s --retries=3 CMD curl http://localhost:80/ping || exit 1
