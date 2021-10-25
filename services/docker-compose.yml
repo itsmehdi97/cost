@@ -40,6 +40,20 @@ services:
       - db
       - queue
 
+  offer:
+    image: offer:latest
+    build: ./offer
+    ports:
+      - 8005:80
+    volumes: 
+      - "./offer/src:/src"
+    depends_on:
+      - db
+      - queue
+    networks:
+      - db
+      - queue
+
   db:
     image: postgres:13.3
     environment:
