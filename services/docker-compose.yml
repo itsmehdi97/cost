@@ -3,6 +3,7 @@ services:
   auth:
     image: auth:latest
     build: ./auth
+    restart: unless-stopped
     ports:
       - 8001:80
     volumes:
@@ -15,6 +16,7 @@ services:
   prop:
     image: prop:latest
     build: ./property
+    restart: unless-stopped
     ports:
       - 8000:80
     volumes: 
@@ -29,6 +31,7 @@ services:
   tax:
     image: tax:latest
     build: ./tax
+    restart: unless-stopped
     ports:
       - 8004:80
     volumes: 
@@ -43,6 +46,7 @@ services:
   offer:
     image: offer:latest
     build: ./offer
+    restart: unless-stopped
     ports:
       - 8005:80
     volumes: 
@@ -90,6 +94,14 @@ services:
       - db
     networks:
       - db
+
+  autoheal:
+    restart: unless-stopped
+    image: willfarrell/autoheal
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   db-data:
