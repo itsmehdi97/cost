@@ -1,6 +1,7 @@
 import asyncio
 
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 
 import aio_pika
@@ -63,3 +64,8 @@ async def current_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+
+@app.get("/ping")
+async def ping():
+    return JSONResponse(status_code=204)

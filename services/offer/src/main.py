@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 
 from database import Session
@@ -44,6 +45,11 @@ async def current_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+
+@app.get("/ping")
+async def ping():
+    return JSONResponse(status_code=204)
 
 
 @app.post("/place-offer", response_model=schemas.Offer)

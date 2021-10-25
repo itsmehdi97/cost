@@ -3,6 +3,7 @@ from typing import List
 from datetime import timedelta
 
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 
@@ -52,6 +53,10 @@ async def get_current_user(
         raise credentials_exception
     return user
 
+
+@app.get("/ping")
+async def ping():
+    return JSONResponse(status_code=204)
 
 
 @app.post("/token/", response_model=schemas.Token)
