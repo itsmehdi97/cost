@@ -23,6 +23,7 @@ class OfferUpdate(OfferBase):
 
 class Offer(OfferBase):
     id: int
+    user_id: int
     canceled: bool
 
     class Config:
