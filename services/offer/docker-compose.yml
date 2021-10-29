@@ -9,6 +9,14 @@ services:
     restart: on-failure
     volumes:
       - ./src:/src
+    environment:
+      - WORKER_THREADS=2
+      - SECRET_KEY=SECRET_KEY
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_SERVER=db
+      - DB_PORT=5432
+      - DATABASE=offer
 
   db:
     image: postgres:13.3
@@ -18,14 +26,14 @@ services:
     volumes:
         - service-data:/var/lib/postgresql/data
 
-  queue:
-    image: queue:latest
-    # build: ./event_queue
-    ports:
-      - "15671:15671"
-      - "15672:15672"
-    # volumes:
-    #   - rabbit-data:/data
+  # queue:
+  #   image: queue:latest
+  #   # build: ./event_queue
+  #   ports:
+  #     - "15671:15671"
+  #     - "15672:15672"
+  #   # volumes:
+  #   #   - rabbit-data:/data
 
   pgadmin:
     image: dpage/pgadmin4:latest
