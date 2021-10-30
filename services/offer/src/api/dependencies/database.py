@@ -10,7 +10,7 @@ from db.repositories.base import BaseRepository
 
 
 def get_db(request: Request):
-    db = request.app._db()
+    db = request.app.state._db()
     try:
         yield db
     finally:
