@@ -4,6 +4,7 @@ from api.routes import router  as api_router
 from core import tasks
 
 
+
 def get_application():
     app = FastAPI(title='offer')
 

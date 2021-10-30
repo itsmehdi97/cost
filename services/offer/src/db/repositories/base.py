@@ -1,7 +1,6 @@
-from databases import Database
-
+from db import Session
 
 
 class BaseRepository:
-    def __init__(self, db: Database):
+    def __init__(self, db: Session):
         self.db = db

@@ -1,7 +1,5 @@
-from typing import Optional
 from functools import lru_cache
 
-from databases import DatabaseURL
 from pydantic import BaseSettings
 
 
@@ -17,8 +15,7 @@ class Settings(BaseSettings):
 
     @property
     def DATABASE_URL(self):
-        return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_SERVER}:{self.DB_PORT}/{self.DATABASE}"
-
+        return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_SERVER}:{self.DB_PORT}/{self.DATABASE}?min_size={2}&max_size={int(self.WORKER_THREADS)*2}"
 
     class Config:
         env_file = ".env"

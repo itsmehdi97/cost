@@ -1,5 +1,8 @@
 from fastapi import FastAPI
-from databases import Database
+
+from sqlalchemy.engine import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.scoping import scoped_session
 
 from core.config import get_settings
 
@@ -10,14 +13,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+
 async def connect_to_db(app: FastAPI) -> None:
-    config = get_settings()
-    database = Database(
-        config.DATABASE_URL, min_size=2, max_size=int(config.WORKER_THREADS)*2)
+    settings = get_settings()
+
 
     try:
-        await database.connect()
-        app.state._db = database
+        logger.info("making db engine...")
+        engine = create_engine(settings.DATABASE_URL)
+
+        session_factory = sessionmaker(bind=engine)
+        Session = scoped_session(session_factory)
+        
+        app.state._db_engine = engine
+        app.state._db = Session
+
     except Exception as e:
         logger.warn("--- DB CONNECTION ERROR ---")
         logger.warn(e)
@@ -26,7 +36,7 @@ async def connect_to_db(app: FastAPI) -> None:
 
 async def close_db_connection(app: FastAPI) -> None:
     try:
-        await app.state._db.disconnect()
+        await app.state._db_engine.dispose()
     except Exception as e:
         logger.warn("--- DB DISCONNECT ERROR ---")
         logger.warn(e)
