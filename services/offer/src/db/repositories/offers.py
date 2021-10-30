@@ -1,14 +1,44 @@
-from sqlalchemy import select
+from datetime import datetime
 
-from db.repositories.base import BaseRepository
 from models.offers import Offer
-
+from db.repositories.base import BaseRepository
+from schemas import offer as offer_schemas
 
 
 
 class OfferRepository(BaseRepository):
-    async def get_offer_by_id(self, *, id: int):
-        query = select(Offer).where(Offer.id == id)
-        db_offer = await self.db.fetch_one(query=str(query), values={'id_1': id})
+    async def get_by_id(self, *, id: int) -> Offer:
+        return self.db.query(Offer) \
+            .filter(Offer.id == id) \
+            .first()
 
-        return Offer(**db_offer) if db_offer else None
+    async def get(self, *, prop_id: int, user_id: int) -> Offer:
+        return self.db.query(Offer) \
+            .filter(
+                Offer.prop_id == prop_id,
+                Offer.user_id == user_id) \
+            .first()
+
+    async def create(self, *,offer: offer_schemas.OfferCreate):
+        db_offer = Offer(**offer.dict())
+        self.db.add(db_offer)
+        self.db.commit()
+        self.db.refresh(db_offer)
+        return db_offer
+
+    async def update(self, *, offer: offer_schemas.OfferUpdate):
+        values = offer.dict()
+        values['updated_at'] = datetime.now()
+
+        self.db.query(Offer) \
+            .filter(Offer.id == offer.id) \
+            .update(values, synchronize_session=False)
+        self.db.commit()
+
+        return await self.get_by_id(id=offer.id)
+
+
+
+
+
+
