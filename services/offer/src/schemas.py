@@ -25,6 +25,9 @@ class Offer(OfferBase):
     id: int
     user_id: int
     canceled: bool
+    accepted: bool
+    accept_date: Optional[datetime] = None
+
 
     class Config:
         orm_mode = True
