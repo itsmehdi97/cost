@@ -17,6 +17,7 @@ services:
       - DB_SERVER=db
       - DB_PORT=5432
       - DATABASE=offer
+      - BROKER_HOST=queue
 
   db:
     image: postgres:13.3
@@ -26,14 +27,14 @@ services:
     volumes:
         - service-data:/var/lib/postgresql/data
 
-  # queue:
-  #   image: queue:latest
-  #   # build: ./event_queue
-  #   ports:
-  #     - "15671:15671"
-  #     - "15672:15672"
-  #   # volumes:
-  #   #   - rabbit-data:/data
+  queue:
+    image: queue:latest
+    # build: ./event_queue
+    ports:
+      - "15671:15671"
+      - "15672:15672"
+    # volumes:
+    #   - rabbit-data:/data
 
   pgadmin:
     image: dpage/pgadmin4:latest

@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     DB_SERVER: str
     DB_PORT: str
     DATABASE: str
+    BROKER_HOST: str
 
     @property
     def DATABASE_URL(self):
