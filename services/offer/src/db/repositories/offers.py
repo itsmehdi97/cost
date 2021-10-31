@@ -2,7 +2,7 @@ from datetime import datetime
 
 from models.offers import Offer
 from db.repositories.base import BaseRepository
-from schemas import offer as offer_schemas
+import schemas
 
 
 
@@ -19,14 +19,14 @@ class OfferRepository(BaseRepository):
                 Offer.user_id == user_id) \
             .first()
 
-    async def create(self, *,offer: offer_schemas.OfferCreate):
+    async def create(self, *,offer: schemas.OfferCreate):
         db_offer = Offer(**offer.dict())
         self.db.add(db_offer)
         self.db.commit()
         self.db.refresh(db_offer)
         return db_offer
 
-    async def update(self, *, offer: offer_schemas.OfferUpdate):
+    async def update(self, *, offer: schemas.OfferUpdate):
         values = offer.dict()
         values['updated_at'] = datetime.now()
 

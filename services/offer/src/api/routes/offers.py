@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from schemas.offer import Offer
 from api.dependencies.database import get_repository
+from api.dependencies.auth import current_user
 from db.repositories.offers import OfferRepository
-from schemas import offer as offer_schemas
+import schemas
 
 
 
@@ -11,7 +11,7 @@ router = APIRouter()
 
 
         
-@router.get("/{offer_id}", response_model=offer_schemas.Offer)
+@router.get("/{offer_id}", response_model=schemas.Offer)
 async def get_offer(
         offer_id: int,
         offers_repo: OfferRepository = Depends(get_repository(OfferRepository))
@@ -21,18 +21,18 @@ async def get_offer(
 
 
 
-@router.post("/place", response_model=offer_schemas.Offer)
+@router.post("/place", response_model=schemas.Offer)
 async def create_offer(
-        offer: offer_schemas.OfferCreate,
+        offer: schemas.OfferCreate,
         # bg_tasks: BackgroundTasks,
-        offers_repo: OfferRepository = Depends(get_repository(OfferRepository))
-        # user: schemas.User = Depends(current_user)
+        offers_repo: OfferRepository = Depends(get_repository(OfferRepository)),
+        user: schemas.User = Depends(current_user)
     ):
-    # if not user.id == offer.user_id:
-    #     raise HTTPException(
-    #         status_code=400,
-    #         detail="Invalid user_id",
-    #     )
+    if not user.id == offer.user_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid user_id",
+        )
 
     if await offers_repo.get(prop_id=offer.prop_id, user_id=offer.user_id):
         raise HTTPException(
@@ -49,13 +49,13 @@ async def create_offer(
     return db_offer
 
 
-@router.put("/update/{offer_id}", response_model=offer_schemas.Offer)
+@router.put("/update/{offer_id}", response_model=schemas.Offer)
 async def update_offer(
         offer_id: int,
         # bg_tasks: BackgroundTasks,
-        offer: offer_schemas.OfferUpdate,
-        offers_repo: OfferRepository = Depends(get_repository(OfferRepository))
-        # user: schemas.User = Depends(current_user)
+        offer: schemas.OfferUpdate,
+        offers_repo: OfferRepository = Depends(get_repository(OfferRepository)),
+        user: schemas.User = Depends(current_user)
     ):
     if not offer_id == offer.id:
         raise HTTPException(
@@ -70,11 +70,11 @@ async def update_offer(
             detail="offer not found",
         )
 
-    # if not user.id == db_offer.user_id:
-    #     raise HTTPException(
-    #         status_code=403,
-    #         detail="not allowed to update this offer",
-    #     )
+    if not user.id == db_offer.user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="not allowed to update this offer",
+        )
     
 
     if not offer.prop_id == db_offer.prop_id:
@@ -91,12 +91,12 @@ async def update_offer(
     return db_offer
 
 
-@router.put("/cancel/{offer_id}", response_model=offer_schemas.Offer)
+@router.put("/cancel/{offer_id}", response_model=schemas.Offer)
 async def update_offer(
         offer_id: int,
         # bg_tasks: BackgroundTasks,
-        offers_repo: OfferRepository = Depends(get_repository(OfferRepository))
-        # user: schemas.User = Depends(current_user)
+        offers_repo: OfferRepository = Depends(get_repository(OfferRepository)),
+        user: schemas.User = Depends(current_user)
     ):
 
     db_offer = await offers_repo.get_by_id(id=offer_id)
@@ -106,14 +106,14 @@ async def update_offer(
             detail="offer not found",
         )
 
-    # if not user.id == db_offer.user_id:
-    #     raise HTTPException(
-    #         status_code=403,
-    #         detail="not allowed to cancel this offer",
-    #     )
+    if not user.id == db_offer.user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="not allowed to cancel this offer",
+        )
     
     if not db_offer.canceled:
-        offer = offer_schemas.OfferUpdate.parse_obj(db_offer.__dict__)
+        offer = schemas.OfferUpdate.parse_obj(db_offer.__dict__)
         offer.canceled = True
 
         db_offer = await offers_repo.update(offer=offer)
