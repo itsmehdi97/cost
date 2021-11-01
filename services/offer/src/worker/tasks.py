@@ -1,16 +1,7 @@
-from celery import Celery
-
-from core.config import get_settings
+from worker.celery import app
 
 
 
-settings = get_settings()
-
-celery = Celery(__name__)
-celery.conf.broker_url = settings.CELERY_BROKER_URL
-celery.conf.result_backend = settings.CELERY_RESULT_BACKEND
-
-
-@celery.task
+@app.task
 def add(x: int, y: int) -> int:
     return x + y
