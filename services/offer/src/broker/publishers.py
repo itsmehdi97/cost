@@ -1,7 +1,11 @@
 from typing import Union
+import logging
 
 import aio_pika
 
+
+
+logger = logging.getLogger(__name__)
 
 
 class Publisher:
@@ -15,6 +19,13 @@ class Publisher:
                 body if isinstance(body, bytes) else bytes(body, encoding='utf-8'),
                 delivery_mode=aio_pika.DeliveryMode.PERSISTENT
             )
+
+            logger.debug('### publishing msg ###')
+            logger.debug('body: ', body)
+            logger.debug('routing key: ', routing_key)
+            logger.debug('exchange: ', exchange)
+            logger.debug('### publishing msg ###')
+
             await exc.publish(msg, routing_key=routing_key)
         finally:
             await self.channel.close()

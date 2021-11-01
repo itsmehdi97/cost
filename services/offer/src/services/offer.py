@@ -20,7 +20,14 @@ class OfferService(BaseService):
                 detail="Offer already exists",
             )
 
-        return await self.repo.create(offer=offer)
+        db_offer = await self.repo.create(offer=offer)
+        self.bg_tasks.add_task(
+            self.publisher.publish,
+            body=schemas.Offer.parse_obj(db_offer.__dict__).json(),
+            routing_key='offer.place',
+            exchange='offers')
+
+        return db_offer
 
     async def update(self, *, id: int, offer: schemas.Offer, requesting_user: schemas.User) -> models.Offer:
         if not id == offer.id:
@@ -48,7 +55,15 @@ class OfferService(BaseService):
                 detail="only price is updatable",
             )
         
-        return await self.repo.update(offer=offer)
+        db_offer = await self.repo.update(offer=offer)
+        if db_offer:
+            self.bg_tasks.add_task(
+                self.publisher.publish,
+                body=schemas.Offer.parse_obj(db_offer.__dict__).json(),
+                routing_key='offer.update',
+                exchange='offers')
+
+        return db_offer
 
     async def cancel(self, *, id: int, requesting_user: schemas.User):
         db_offer = await self.repo.get_by_id(id=id)
@@ -69,6 +84,12 @@ class OfferService(BaseService):
             offer.canceled = True
 
             db_offer = await self.repo.update(offer=offer)
+
+            self.bg_tasks.add_task(
+                self.publisher.publish,
+                body=schemas.Offer.parse_obj(db_offer.__dict__).json(),
+                routing_key='offer.cancel',
+                exchange='offers')
 
         return db_offer
         

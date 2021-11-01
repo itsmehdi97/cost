@@ -1,6 +1,6 @@
-from dependencies.auth import current_user
-from dependencies.database import get_db, get_repository
-from dependencies.services import get_service, get_publisher
+from api.dependencies.auth import current_user
+from api.dependencies.database import get_db, get_repository
+from api.dependencies.services import get_service, get_publisher
 
 
 
