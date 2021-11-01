@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     DB_PORT: str
     DATABASE: str
     BROKER_HOST: str
+    CELERY_BROKER_URL: str
+    CELERY_RESULT_BACKEND: str
 
     @property
     def DATABASE_URL(self):

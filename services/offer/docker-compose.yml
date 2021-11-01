@@ -18,6 +18,30 @@ services:
       - DB_PORT=5432
       - DATABASE=offer
       - BROKER_HOST=queue
+      - CELERY_BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
+
+  redis:
+    image: redis:alpine
+  
+  worker:
+    build: .
+    command: celery -A worker.tasks worker --loglevel=info
+    volumes:
+      - ./src:/src
+    environment:
+      - WORKER_THREADS=2
+      - SECRET_KEY=SECRET_KEY
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_SERVER=db
+      - DB_PORT=5432
+      - DATABASE=offer
+      - BROKER_HOST=queue
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
 
   db:
     image: postgres:13.3
