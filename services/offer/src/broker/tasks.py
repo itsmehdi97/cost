@@ -17,6 +17,7 @@ async def connect_to_broker(app):
         logging.warn('--- BROKER CONNECTION ERROR ---')
         logger.warn(e)
         logging.warn('--- BROKER CONNECTION ERROR ---')
+
         raise e
 
 
