@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 
-from api.dependencies.database import get_repository
-from api.dependencies.services import get_service
 from services.offer import OfferService 
-from api.dependencies.auth import current_user
-from api.dependencies.services import get_publisher
 from broker.publishers import Publisher
 from db.repositories.offers import OfferRepository
 import schemas
+from api.dependencies import ( 
+    get_repository,
+    get_service,
+    current_user,
+    get_publisher
+)
 
 
 
