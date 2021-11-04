@@ -3,7 +3,8 @@ from sqlalchemy import (
     Integer,
     Numeric,
     DateTime,
-    Boolean
+    Boolean,
+    String
 )
 
 from models.base import BaseModel
@@ -18,6 +19,7 @@ class Offer(BaseModel):
     prop_id = Column(Integer, nullable=False)
     price = Column(Numeric, nullable=False)
 
+    task_id = Column(String(length=128), nullable=True)
     canceled = Column(Boolean, default=False)
     accepted = Column(Boolean, default=False)
     accept_date = Column(DateTime, nullable=True)

@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from services.base import BaseService
 import schemas
 import models
+from worker import tasks
 
 
 
@@ -26,6 +27,10 @@ class OfferService(BaseService):
             body=schemas.Offer.parse_obj(db_offer.__dict__).json(),
             routing_key='offer.place',
             exchange='offers')
+
+        self.bg_tasks.add_task(
+            tasks.accept_offer.delay,
+            db_offer.id)
 
         return db_offer
 

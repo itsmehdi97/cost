@@ -24,5 +24,3 @@ def get_service(*, Service_type: Type[BaseService], Repo_type: Type[BaseReposito
         return Service_type(repo=repo, publisher=publisher, bg_tasks=bg_tasks)
     
     return _get_service
-
-

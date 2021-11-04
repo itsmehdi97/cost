@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.scoping import scoped_session
 
 from core.config import get_settings
+from db import Session
 
 import logging
 
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 
-async def connect_to_db(app: FastAPI) -> None:
+def connect_to_db(app: FastAPI = None) -> Session:
     settings = get_settings()
 
 
@@ -25,18 +26,23 @@ async def connect_to_db(app: FastAPI) -> None:
         session_factory = sessionmaker(bind=engine)
         Session = scoped_session(session_factory)
         
-        app.state._db_engine = engine
-        app.state._db = Session
+        if app:
+            app.state._db_engine = engine
+            app.state._db = Session
+
+        return Session
 
     except Exception as e:
         logger.warn("--- DB CONNECTION ERROR ---")
         logger.warn(e)
         logger.warn("--- DB CONNECTION ERROR ---")
+    
 
 
-async def close_db_connection(app: FastAPI) -> None:
+
+def close_db_connection(app: FastAPI) -> None:
     try:
-        await app.state._db_engine.dispose()
+        app.state._db_engine.dispose()
     except Exception as e:
         logger.warn("--- DB DISCONNECT ERROR ---")
         logger.warn(e)

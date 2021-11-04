@@ -9,19 +9,11 @@ from api.dependencies import (
     get_service,
     current_user
 )
-from worker import tasks
+
+
+
 
 router = APIRouter()
-
-
-@router.get('/task')
-async def tasdf():
-    print('adfad')
-    print('asdfasdf')
-    res = tasks.add.delay(3,10)
-    print(res.get(timeout=5))
-    print('#####', res.task_id)
-
 
 
 @router.get("/{offer_id}", response_model=schemas.Offer)

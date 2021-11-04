@@ -9,7 +9,7 @@ from broker.tasks import connect_to_broker, close_broker_connection
 
 def create_start_app_handler(app: FastAPI) -> Callable:
     async def start_app() -> None:
-        await connect_to_db(app)
+        connect_to_db(app=app)
         await connect_to_broker(app)
 
     return start_app

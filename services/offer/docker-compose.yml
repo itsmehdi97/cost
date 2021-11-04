@@ -22,7 +22,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379
 
   redis:
-    image: redis:alpine
+    image: redis:5
   
   worker:
     build: .
@@ -53,7 +53,7 @@ services:
 
   queue:
     image: queue:latest
-    # build: ./event_queue
+    build: ../event_queue
     ports:
       - "15671:15671"
       - "15672:15672"
