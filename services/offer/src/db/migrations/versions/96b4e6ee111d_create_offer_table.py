@@ -1,8 +1,8 @@
-"""craete offer table
+"""create offer table
 
-Revision ID: cc70436e2537
+Revision ID: 96b4e6ee111d
 Revises: 
-Create Date: 2021-10-29 09:17:58.312468
+Create Date: 2021-11-05 09:40:25.733359
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'cc70436e2537'
+revision = '96b4e6ee111d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,9 +25,10 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('prop_id', sa.Integer(), nullable=False),
     sa.Column('price', sa.Numeric(), nullable=False),
-    sa.Column('canceled', sa.Boolean(), nullable=True),
-    sa.Column('accepted', sa.Boolean(), nullable=True),
+    sa.Column('status', sa.Enum('CANCELED', 'PENDING', 'ACCEPTED', 'TRANSFERRED', name='offerstatus'), nullable=True),
+    sa.Column('task_id', sa.String(length=128), nullable=True),
     sa.Column('accept_date', sa.DateTime(), nullable=True),
+    sa.Column('transfer_date', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
