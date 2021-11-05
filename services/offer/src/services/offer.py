@@ -37,7 +37,7 @@ class OfferService(BaseService):
         self.bg_tasks.add_task(
             tasks.accept_offer.apply_async,
             (db_offer.id,),
-            eta=datetime.now() + timedelta(minutes=settings.OFFER_ACCEPT_DELAY))
+            eta=db_offer.created_at + timedelta(minutes=settings.OFFER_ACCEPT_DELAY))
 
         return db_offer
 
@@ -93,7 +93,7 @@ class OfferService(BaseService):
         
         if not db_offer.canceled:
             offer = schemas.OfferUpdate.parse_obj(db_offer.__dict__)
-            offer.canceled = True
+            offer.status = models.OfferStatus.CANCELED
 
             db_offer = await self.repo.update(offer=offer)
 
