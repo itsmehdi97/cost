@@ -36,9 +36,3 @@ class OfferRepository(BaseRepository):
         self.db.commit()
 
         return await self.get_by_id(id=offer.id)
-
-
-
-
-
-

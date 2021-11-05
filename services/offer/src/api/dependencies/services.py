@@ -15,6 +15,7 @@ async def get_publisher(request: Request) -> Publisher:
     return Publisher(
         await broker_conn.channel())
 
+
 def get_service(*, Service_type: Type[BaseService], Repo_type: Type[BaseRepository]) -> Callable:
     def _get_service(
             bg_tasks : BackgroundTasks,
