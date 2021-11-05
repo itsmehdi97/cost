@@ -28,6 +28,7 @@ class OfferService(BaseService):
             )
 
         db_offer = await self.repo.create(offer=offer)
+
         self.bg_tasks.add_task(
             self.publisher.publish,
             body=schemas.Offer.parse_obj(db_offer.__dict__).json(),
@@ -35,11 +36,13 @@ class OfferService(BaseService):
             exchange='offers')
 
         self.bg_tasks.add_task(
-            tasks.accept_offer.apply_async,
-            (db_offer.id,),
-            eta=db_offer.created_at + timedelta(minutes=settings.OFFER_ACCEPT_DELAY))
+            self._schedule_accept_task,
+            offer=db_offer,
+            eta=db_offer.created_at + timedelta(minutes=settings.OFFER_ACCEPT_DELAY),
+            requesting_user=requesting_user)
 
         return db_offer
+
 
     async def update(self, *, id: int, offer: schemas.Offer, requesting_user: schemas.User) -> models.Offer:
         if not id == offer.id:
@@ -65,6 +68,12 @@ class OfferService(BaseService):
             raise HTTPException(
                 status_code=400,
                 detail="only price is updatable",
+            )
+        
+        if not db_offer.status == models.OfferStatus.PENDING:
+            raise HTTPException(
+                status_code=400,
+                detail=f"offer cannot ne updated at this state ({db_offer.status})",
             )
         
         db_offer = await self.repo.update(offer=offer)
@@ -104,4 +113,11 @@ class OfferService(BaseService):
                 exchange='offers')
 
         return db_offer
-        
+
+
+    async def _schedule_accept_task(self, *, offer: models.Offer, eta: datetime, requesting_user: schemas.User):
+            res = tasks.accept_offer.apply_async((offer.id,), eta=eta)
+            accepting_offer = schemas.Offer.parse_obj(offer.__dict__)
+            accepting_offer.task_id = res.task_id
+
+            await self.repo.update(offer=accepting_offer)
