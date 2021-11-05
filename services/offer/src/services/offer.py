@@ -38,8 +38,7 @@ class OfferService(BaseService):
         self.bg_tasks.add_task(
             self._schedule_accept_task,
             offer=db_offer,
-            eta=db_offer.created_at + timedelta(minutes=settings.OFFER_ACCEPT_DELAY),
-            requesting_user=requesting_user)
+            eta=db_offer.created_at + timedelta(minutes=settings.OFFER_ACCEPT_DELAY))
 
         return db_offer
 
@@ -115,7 +114,7 @@ class OfferService(BaseService):
         return db_offer
 
 
-    async def _schedule_accept_task(self, *, offer: models.Offer, eta: datetime, requesting_user: schemas.User):
+    async def _schedule_accept_task(self, *, offer: models.Offer, eta: datetime):
             res = tasks.accept_offer.apply_async((offer.id,), eta=eta)
             accepting_offer = schemas.Offer.parse_obj(offer.__dict__)
             accepting_offer.task_id = res.task_id
