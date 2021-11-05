@@ -1,10 +1,16 @@
+from datetime import datetime, timedelta
+
 from fastapi import HTTPException
 
 from services.base import BaseService
 import schemas
 import models
 from worker import tasks
+from core.config import get_settings
 
+
+
+settings = get_settings()
 
 
 class OfferService(BaseService):
@@ -29,8 +35,9 @@ class OfferService(BaseService):
             exchange='offers')
 
         self.bg_tasks.add_task(
-            tasks.accept_offer.delay,
-            db_offer.id)
+            tasks.accept_offer.apply_async,
+            (db_offer.id,),
+            eta=datetime.now() + timedelta(minutes=settings.OFFER_ACCEPT_DELAY))
 
         return db_offer
 

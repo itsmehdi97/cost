@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     BROKER_HOST: str
     CELERY_BROKER_URL: str
     CELERY_RESULT_BACKEND: str
+    OFFER_ACCEPT_DELAY: int
 
     @property
     def DATABASE_URL(self):

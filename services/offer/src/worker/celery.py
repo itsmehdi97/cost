@@ -2,6 +2,7 @@ import weakref
 from asgiref.sync import async_to_sync
 
 from celery import Celery
+from celery import Task
 
 import schemas
 from db.repositories.offers import OfferRepository
@@ -11,16 +12,23 @@ from db.tasks import connect_to_db
 from db import Session
 
 
-class CustomCeleryApp(Celery):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
-        self.db = connect_to_db()
-        #TODO: close db connection
-        
 settings = get_settings()
 
-app = CustomCeleryApp(__name__)
+
+class CustomTask(Task):
+    _db = None
+
+    @property
+    def db(self):
+        if self._db is None:
+            self._db = connect_to_db()
+        return self._db
+
+
+        
+
+app = Celery(__name__, task_cls="worker.celery.CustomTask")
 app.conf.broker_url = settings.CELERY_BROKER_URL
 app.conf.result_backend = settings.CELERY_RESULT_BACKEND
 

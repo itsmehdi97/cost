@@ -9,7 +9,7 @@ from db.repositories.offers import OfferRepository
 
 @app.task
 def accept_offer(offer_id: int):
-    repo = OfferRepository(app.db)
+    repo = OfferRepository(accept_offer.db)
     
     offer = async_to_sync(repo.get_by_id)(id=offer_id)
     

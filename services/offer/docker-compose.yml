@@ -20,6 +20,7 @@ services:
       - BROKER_HOST=queue
       - CELERY_BROKER_URL=redis://redis:6379
       - CELERY_RESULT_BACKEND=redis://redis:6379
+      - OFFER_ACCEPT_DELAY=1
 
   redis:
     image: redis:5
@@ -40,6 +41,7 @@ services:
       - BROKER_HOST=queue
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - OFFER_ACCEPT_DELAY=1
     depends_on:
       - redis
 
