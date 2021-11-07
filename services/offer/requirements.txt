@@ -1,7 +1,8 @@
 fastapi
 gunicorn
 uvicorn
-psycopg2-binary
+databases[postgresql]
+psycopg2-binary # for synchronus methods
 sqlalchemy
 alembic
 pyjwt
@@ -9,3 +10,4 @@ python-multipart
 python-jose[cryptography]
 pydantic[dotenv]
 aio-pika
+celery[redis]

@@ -5,11 +5,13 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+import models
+
 
 
 class OfferBase(BaseModel):
     prop_id: int
-    price: int
+    price: Decimal
 
 
 class OfferCreate(OfferBase):
@@ -18,21 +20,16 @@ class OfferCreate(OfferBase):
 
 class OfferUpdate(OfferBase):
     id: int
-    canceled: Optional[bool] = False
-
+    status: Optional[models.OfferStatus]
 
 class Offer(OfferBase):
     id: int
     user_id: int
-    canceled: bool
-    accepted: bool
     accept_date: Optional[datetime] = None
+    transfer_date: Optional[datetime] = None
+    status: Optional[models.OfferStatus]
+    task_id: Optional[str]
 
 
     class Config:
         orm_mode = True
-
-
-class User(BaseModel):
-    id: int
-    username: str

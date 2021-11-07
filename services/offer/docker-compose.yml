@@ -1,14 +1,51 @@
 version: "3.9"  # optional since v1.27.0
 services:
   web:
-    # command: uvicorn main:app --reload --host 0.0.0.0 --port 80 --log-level debug
-    # command: gunicorn -w 4 -b 0.0.0.0:80 -k uvicorn.workers.UvicornWorker --log-level debug main:app
+    # command: uvicorn api.server:app --workers 10 --reload --host 0.0.0.0 --port 80 --log-level debug
+    # command: gunicorn -w 4 -b 0.0.0.0:80 -k uvicorn.workers.UvicornWorker --log-level debug api.server:app
     build: .
     ports:
       - "8000:80"
     restart: on-failure
     volumes:
       - ./src:/src
+    environment:
+      - WORKER_THREADS=2
+      - SECRET_KEY=SECRET_KEY
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_SERVER=db
+      - DB_PORT=5432
+      - DATABASE=offer
+      - BROKER_HOST=queue
+      - CELERY_BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
+      - OFFER_ACCEPT_DELAY=1
+      - OFFER_TRANSFER_DELAY=1
+
+  redis:
+    image: redis:5
+  
+  worker:
+    build: .
+    command: celery -A worker.celery worker --loglevel=info
+    volumes:
+      - ./src:/src
+    environment:
+      - WORKER_THREADS=2
+      - SECRET_KEY=SECRET_KEY
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_SERVER=db
+      - DB_PORT=5432
+      - DATABASE=offer
+      - BROKER_HOST=queue
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - OFFER_ACCEPT_DELAY=1
+      - OFFER_TRANSFER_DELAY=1
+    depends_on:
+      - redis
 
   db:
     image: postgres:13.3
@@ -20,7 +57,7 @@ services:
 
   queue:
     image: queue:latest
-    # build: ./event_queue
+    build: ../event_queue
     ports:
       - "15671:15671"
       - "15672:15672"
