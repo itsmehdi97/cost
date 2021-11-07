@@ -3,6 +3,7 @@ services:
   auth:
     image: auth:latest
     build: ./auth
+    restart: unless-stopped
     ports:
       - 8001:80
     volumes:
@@ -15,6 +16,7 @@ services:
   prop:
     image: prop:latest
     build: ./property
+    restart: unless-stopped
     ports:
       - 8000:80
     volumes: 
@@ -29,6 +31,7 @@ services:
   tax:
     image: tax:latest
     build: ./tax
+    restart: unless-stopped
     ports:
       - 8004:80
     volumes: 
@@ -39,6 +42,69 @@ services:
     networks:
       - db
       - queue
+
+  redis:
+    image: redis:alpine
+    networks:
+      - redis
+  
+  worker:
+    build: ./offer
+    command: celery -A worker.celery worker --loglevel=info
+    volumes:
+      - ./offer/src:/src
+    environment:
+      - WORKER_THREADS=2
+      - SECRET_KEY=SECRET_KEY
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_SERVER=db
+      - DB_PORT=5432
+      - DATABASE=offer
+      - BROKER_HOST=queue
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - OFFER_ACCEPT_DELAY=1
+      - OFFER_TRANSFER_DELAY=1
+    depends_on:
+      - redis
+      - db
+      - queue
+    networks:
+      - db
+      - queue
+      - redis
+
+
+  offer:
+    image: offer:latest
+    build: ./offer
+    restart: unless-stopped
+    environment:
+      - WORKER_THREADS=2
+      - SECRET_KEY=SECRET_KEY
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_SERVER=db
+      - DB_PORT=5432
+      - DATABASE=offer
+      - BROKER_HOST=queue
+      - CELERY_BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
+      - OFFER_ACCEPT_DELAY=1
+      - OFFER_TRANSFER_DELAY=1
+    ports:
+      - 8005:80
+    volumes: 
+      - "./offer/src:/src"
+    depends_on:
+      - redis
+      - db
+      - queue
+    networks:
+      - db
+      - queue
+      - redis
 
   db:
     image: postgres:13.3
@@ -77,6 +143,14 @@ services:
     networks:
       - db
 
+  autoheal:
+    restart: unless-stopped
+    image: willfarrell/autoheal
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
 volumes:
   db-data:
   rabbit-data:
@@ -85,4 +159,4 @@ volumes:
 networks:
   queue:
   db:
-  
+  redis:

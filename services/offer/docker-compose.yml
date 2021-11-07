@@ -24,7 +24,7 @@ services:
       - OFFER_TRANSFER_DELAY=1
 
   redis:
-    image: redis:5
+    image: redis:alpine
   
   worker:
     build: .
