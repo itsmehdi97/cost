@@ -15,6 +15,6 @@ async def on_prop_msg(repo: PropRepository, msg: IncomingMessage):
         msg.ack()
 
     if msg_type == 'update':
-        update_prop = schemas.PropUpdate.parse_ras(msg.body)
+        update_prop = schemas.PropUpdate.parse_raw(msg.body)
         await repo.update(prop=update_prop)
         msg.ack()
