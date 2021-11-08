@@ -28,14 +28,11 @@ class CustomTask(Task):
             self._db = connect_to_db()
         return self._db
 
-
-    def get_publisher(self):
+    @property
+    def publisher(self):
         if self._broker_conn is None:
-
             self._broker_conn = connect_to_broker_sync()
         
-        print('sync', self._broker_conn)
-
         ch = self._broker_conn.channel()
         return Publisher(ch)
         
