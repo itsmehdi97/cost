@@ -8,6 +8,8 @@ services:
       - 8001:80
     volumes:
       - "./auth/src:/src"
+    labels:
+      - autoheal=true
     depends_on:
       - db
     networks:
@@ -21,6 +23,8 @@ services:
       - 8000:80
     volumes: 
       - "./property/src:/src"
+    labels:
+      - autoheal=true
     depends_on:
       - db
       - queue
@@ -36,6 +40,8 @@ services:
       - 8004:80
     volumes: 
       - "./tax/src:/src"
+    labels:
+      - autoheal=true
     depends_on:
       - db
       - queue
@@ -53,6 +59,8 @@ services:
     command: celery -A worker.celery worker --loglevel=info
     volumes:
       - ./offer/src:/src
+    labels:
+      - autoheal=false
     environment:
       - WORKER_THREADS=2
       - SECRET_KEY=SECRET_KEY
@@ -93,6 +101,8 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379
       - OFFER_ACCEPT_DELAY=1
       - OFFER_TRANSFER_DELAY=1
+    labels:
+      - autoheal=true
     ports:
       - 8005:80
     volumes: 
@@ -147,7 +157,7 @@ services:
     restart: unless-stopped
     image: willfarrell/autoheal
     environment:
-      - AUTOHEAL_CONTAINER_LABEL=all
+      - AUTOHEAL_CONTAINER_LABEL=autoheal
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
