@@ -13,6 +13,7 @@ async def connect_to_broker(app):
         app.state._broker_conn = connection
         async with connection.channel() as ch:
             await ch.declare_exchange('offers', type='topic', durable=True)
+            await ch.declare_exchange('props', type='topic', durable=True)
     except Exception as e:
         logger.warn('--- BROKER CONNECTION ERROR ---')
         logger.warn(e)
