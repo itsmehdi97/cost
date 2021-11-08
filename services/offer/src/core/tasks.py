@@ -10,7 +10,7 @@ from consumer.tasks import init_consumers
 def create_start_app_handler(app: FastAPI) -> Callable:
     async def start_app() -> None:
         connect_to_db(app=app)
-        await connect_to_broker(app)
+        await connect_to_broker(app=app)
         await init_consumers(app)
 
     return start_app

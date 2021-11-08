@@ -7,8 +7,6 @@ import schemas
 async def on_prop_msg(repo: PropRepository, msg: IncomingMessage):
     msg_type = msg.routing_key.split('.')[1]
 
-    print('## prop msg rec', msg.body)
-
     if msg_type == 'add':
         new_prop = schemas.PropCreate.parse_raw(msg.body)
         await repo.create(prop=new_prop)

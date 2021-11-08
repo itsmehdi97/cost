@@ -25,7 +25,10 @@ def accept_offer(offer_id: int):
     new_offer.task_id = res.task_id
 
     async_to_sync(repo.update)(offer=new_offer)
-
+    accept_offer.publisher.publish_sync(
+        body=new_offer.json(),
+        routing_key='offer.accept',
+        exchange='offers')
 
     return new_offer.json()
 
@@ -40,6 +43,9 @@ def transfer_offer(offer_id: int):
     new_offer.status = models.OfferStatus.TRANSFERRED
 
     async_to_sync(repo.update)(offer=new_offer)
-
+    accept_offer.publisher.publish_sync(
+        body=new_offer.json(),
+        routing_key='offer.transfer',
+        exchange='offers')
 
     return new_offer.json()
