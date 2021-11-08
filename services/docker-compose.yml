@@ -61,6 +61,8 @@ services:
       - ./offer/src:/src
     labels:
       - autoheal=false
+    healthcheck:
+      disable: true
     environment:
       - WORKER_THREADS=2
       - SECRET_KEY=SECRET_KEY
