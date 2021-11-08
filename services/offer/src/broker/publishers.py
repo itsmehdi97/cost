@@ -29,3 +29,12 @@ class Publisher:
             await exc.publish(msg, routing_key=routing_key)
         finally:
             await self.channel.close()
+
+    def publish_sync(self, *, body: Union[str, bytes], routing_key: str, exchange: str) -> None:
+        try:
+            self.channel.basic_publish(
+                exchange=exchange,
+                routing_key=routing_key,
+                body=body)
+        finally:
+            self.channel.close()
