@@ -26,14 +26,12 @@ async def connect_to_broker(app=None):
         raise e
 
 def connect_to_broker_sync():
-    print('########### CONNECTING SYNC ##')
     settings = get_settings()
     try:
         connection = pika.BlockingConnection(pika.ConnectionParameters(settings.BROKER_HOST))
         ch = connection.channel()
         ch.exchange_declare(exchange='offers', exchange_type='topic', durable=True)
         ch.exchange_declare(exchange='props', exchange_type='topic', durable=True)
-        print('########### CONNECTING SYNC ##', connection)
 
         return connection
     except Exception as e:
