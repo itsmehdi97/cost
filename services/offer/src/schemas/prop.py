@@ -10,7 +10,7 @@ class PropBase(BaseModel):
 
 
 class PropCreate(PropBase):
-    pass
+    id: int
 
 
 class PropUpdate(PropBase):
