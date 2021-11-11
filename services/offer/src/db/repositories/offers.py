@@ -36,3 +36,11 @@ class OfferRepository(BaseRepository):
         self.db.commit()
 
         return await self.get_by_id(id=offer.id)
+
+    async def get_max_offered_price(self, *, prop_id: int):
+        offer = self.db.query(Offer) \
+            .filter(Offer.prop_id == prop_id) \
+            .order_by(Offer.price.desc()) \
+            .first()
+        
+        return offer.price if offer else None

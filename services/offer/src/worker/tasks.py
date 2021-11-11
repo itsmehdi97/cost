@@ -5,6 +5,7 @@ import schemas
 import models
 from worker.celery import app
 from db.repositories.offers import OfferRepository
+from db.repositories.prop import PropRepository
 from core.config import get_settings
 
 
@@ -36,6 +37,7 @@ def accept_offer(offer_id: int):
 @app.task(ignore_result=True)
 def transfer_offer(offer_id: int):
     repo = OfferRepository(transfer_offer.db)
+    prop_repo = PropRepository(transfer_offer.db)
 
     offer = async_to_sync(repo.get_by_id)(id=offer_id)
     new_offer = schemas.Offer.parse_obj(offer.__dict__)
@@ -47,5 +49,11 @@ def transfer_offer(offer_id: int):
         body=new_offer.json(),
         routing_key='offer.transfer',
         exchange='offers')
+
+    prop = async_to_sync(prop_repo.get_by_id)(id=new_offer.prop_id)
+    new_prop = schemas.Prop.parse_obj(prop.__dict__)
+    new_prop.price = new_offer.price
+    async_to_sync(prop_repo.update)(prop=new_prop)
+
 
     return new_offer.json()

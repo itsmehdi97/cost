@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from fastapi import HTTPException
+from celery.result import AsyncResult
 
 from services.base import BaseService
 import schemas
@@ -25,6 +26,12 @@ class OfferService(BaseService):
             raise HTTPException(
                 status_code=400,
                 detail="Offer already exists",
+            )
+
+        if await self._min_offerable_price(prop_id=offer.prop_id) > offer.price:
+            raise HTTPException(
+                status_code=400,
+                detail="offer price is not acceptable",
             )
 
         db_offer = await self.repo.create(offer=offer)
@@ -74,16 +81,27 @@ class OfferService(BaseService):
                 status_code=400,
                 detail=f"offer cannot ne updated at this state ({db_offer.status})",
             )
+
+        if await self._min_offerable_price(offer.prop_id) > offer.price:
+            raise HTTPException(
+                status_code=400,
+                detail=f"offer price is not decreasable",
+            )
         
         db_offer = await self.repo.update(offer=offer)
         if db_offer:
+            self.bg_tasks.add_task(
+                self._schedule_accept_task,
+                offer=db_offer,
+                eta=db_offer.updated_at + timedelta(minutes=settings.OFFER_ACCEPT_DELAY))
+
             self.bg_tasks.add_task(
                 self.publisher.publish,
                 body=schemas.Offer.parse_obj(db_offer.__dict__).json(),
                 routing_key='offer.update',
                 exchange='offers')
 
-        return db_offer
+        return db_offer      
 
     async def cancel(self, *, id: int, requesting_user: schemas.User):
         db_offer = await self.repo.get_by_id(id=id)
@@ -115,8 +133,20 @@ class OfferService(BaseService):
 
 
     async def _schedule_accept_task(self, *, offer: models.Offer, eta: datetime):
-            res = tasks.accept_offer.apply_async((offer.id,), eta=eta)
-            accepting_offer = schemas.Offer.parse_obj(offer.__dict__)
-            accepting_offer.task_id = res.task_id
+        if offer.task_id:
+            AsyncResult(offer.task_id).revoke(terminate=True)
+            print('######## revoked', offer.task_id)
 
-            await self.repo.update(offer=accepting_offer)
+        res = tasks.accept_offer.apply_async((offer.id,), eta=eta)
+        accepting_offer = schemas.Offer.parse_obj(offer.__dict__)
+        accepting_offer.task_id = res.task_id
+
+        await self.repo.update(offer=accepting_offer)
+
+    async def _min_offerable_price(self, prop_id):
+        max_offered_price = await self.repo.get_max_offered_price(prop_id=prop_id)
+        if max_offered_price:
+            return max_offered_price + settings.OFFER_PRICE_ACCEPT_TRESHOLD
+
+        #TODO: inject prop repo too(?)
+        return self.repo.db.query(models.Prop).filter(models.Prop.id == prop_id).first().price + settings.OFFER_PRICE_ACCEPT_TRESHOLD

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from functools import lru_cache
 
 from pydantic import BaseSettings
@@ -17,6 +18,8 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str
     OFFER_ACCEPT_DELAY: int
     OFFER_TRANSFER_DELAY: int
+
+    OFFER_PRICE_ACCEPT_TRESHOLD: Decimal
 
     @property
     def DATABASE_URL(self):

@@ -31,8 +31,14 @@ class CustomTask(Task):
     @property
     def publisher(self):
         if self._broker_conn is None:
+            print('###### CON WAS None')
             self._broker_conn = connect_to_broker_sync()
         
+        if self._broker_conn.is_closed:
+            print('###### CON WAS CLOSED!!')
+            self._broker_conn = connect_to_broker_sync()
+
+
         ch = self._broker_conn.channel()
         return Publisher(ch)
         

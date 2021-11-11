@@ -50,7 +50,7 @@ services:
       - queue
 
   redis:
-    image: redis:alpine
+    image: redis:5
     networks:
       - redis
   
@@ -76,6 +76,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - OFFER_ACCEPT_DELAY=1
       - OFFER_TRANSFER_DELAY=1
+      - OFFER_PRICE_ACCEPT_TRESHOLD=100
     depends_on:
       - redis
       - db
@@ -103,6 +104,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379
       - OFFER_ACCEPT_DELAY=1
       - OFFER_TRANSFER_DELAY=1
+      - OFFER_PRICE_ACCEPT_TRESHOLD=100
     labels:
       - autoheal=true
     ports:
